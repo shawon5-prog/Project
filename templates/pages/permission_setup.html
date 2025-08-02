@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Permission Setup</title>
+  <style>
+    body {
+      background-color: #1e1e1e;
+      color: #f0f0f0;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background-color: #2c2c2c;
+      padding: 30px;
+      border-radius: 10px;
+    }
+
+    h2 {
+      color: #00ff88;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .flash {
+      margin-bottom: 20px;
+      padding: 12px;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+
+    .flash.success {
+      background-color: #2e7d32;
+      color: #c8facc;
+    }
+
+    .flash.danger {
+      background-color: #b71c1c;
+      color: #ffcdd2;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      background: #333;
+      border: none;
+      color: #fff;
+      border-radius: 5px;
+      font-size: 15px;
+      margin-bottom: 20px;
+    }
+
+    .menu-section {
+      margin-top: 25px;
+      padding: 15px;
+      border: 1px solid #444;
+      border-radius: 8px;
+      background-color: #1e1e1e;
+    }
+
+    .menu-title {
+      font-size: 18px;
+      font-weight: bold;
+      color: #00c0ff;
+      margin-bottom: 10px;
+    }
+
+    label {
+      display: inline-block;
+      width: 48%;
+      margin-bottom: 10px;
+      font-size: 15px;
+    }
+
+    label input[type="checkbox"] {
+      margin-right: 8px;
+      transform: scale(1.1);
+    }
+
+    button {
+      background: #00ff88;
+      border: none;
+      color: #000;
+      padding: 12px 20px;
+      width: 100%;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 16px;
+      margin-top: 25px;
+    }
+
+    button:hover {
+      background: #00cc66;
+    }
+
+    .note {
+      color: orange;
+      font-style: italic;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h2>🔐 Permission Setup (by PIN)</h2>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="{{ url_for('management.permission_setup') }}">
+      <input type="text" name="user_pin" placeholder="Enter PIN (e.g. 0012)" value="{{ selected_user_pin or '' }}" required />
+
+      {% if selected_user %}
+        <p>✅ Selected User ID: <strong>{{ selected_user.user_id }}</strong></p>
+
+        <!-- ✅ Medical User ID -->
+        <div class="menu-section">
+          <div class="menu-title">Medical User ID</div>
+          <label><input type="checkbox" name="permissions" value="mbbs_user_id" {% if 'mbbs_user_id' in selected_user.permissions %}checked{% endif %}> MBBS User ID</label>
+          <label><input type="checkbox" name="permissions" value="bds_user_id" {% if 'bds_user_id' in selected_user.permissions %}checked{% endif %}> BDS User ID</label>
+        </div>
+
+        <!-- ✅ Medical Password -->
+        <div class="menu-section">
+          <div class="menu-title">Medical Password</div>
+          <label><input type="checkbox" name="permissions" value="mbbs_pass_recover" {% if 'mbbs_pass_recover' in selected_user.permissions %}checked{% endif %}> MBBS Password</label>
+          <label><input type="checkbox" name="permissions" value="bds_pass_recover" {% if 'bds_pass_recover' in selected_user.permissions %}checked{% endif %}> BDS Password</label>
+        </div>
+
+        <!-- ✅ Medical Roll -->
+        <div class="menu-section">
+          <div class="menu-title">Medical Roll</div>
+          <label><input type="checkbox" name="permissions" value="mbbs_roll" {% if 'mbbs_roll' in selected_user.permissions %}checked{% endif %}> MBBS Roll</label>
+          <label><input type="checkbox" name="permissions" value="bds_roll" {% if 'bds_roll' in selected_user.permissions %}checked{% endif %}> BDS Roll</label>
+        </div>
+
+        <!-- ✅ Medical Result -->
+        <div class="menu-section">
+          <div class="menu-title">Medical Result</div>
+          <label><input type="checkbox" name="permissions" value="mbbs_result" {% if 'mbbs_result' in selected_user.permissions %}checked{% endif %}> MBBS Result</label>
+          <label><input type="checkbox" name="permissions" value="bds_result" {% if 'bds_result' in selected_user.permissions %}checked{% endif %}> BDS Result</label>
+        </div>
+
+        <!-- ✅ Report -->
+        <div class="menu-section">
+          <div class="menu-title">Report</div>
+          <label><input type="checkbox" name="permissions" value="individual_report" {% if 'individual_report' in selected_user.permissions %}checked{% endif %}> Individual Report</label>
+          <label><input type="checkbox" name="permissions" value="combined_report" {% if 'combined_report' in selected_user.permissions %}checked{% endif %}> Combined Report</label>
+        </div>
+
+        <!-- ✅ Management -->
+        <div class="menu-section">
+          <div class="menu-title">Management</div>
+          <label><input type="checkbox" name="permissions" value="add_members" {% if 'add_members' in selected_user.permissions %}checked{% endif %}> Add Members</label>
+          <label><input type="checkbox" name="permissions" value="permission_setup" {% if 'permission_setup' in selected_user.permissions %}checked{% endif %}> Permission Setup</label>
+          <label><input type="checkbox" name="permissions" value="user_info_edit" {% if 'user_info_edit' in selected_user.permissions %}checked{% endif %}> User Info Edit</label>
+          <label><input type="checkbox" name="permissions" value="activity_logs" {% if 'activity_logs' in selected_user.permissions %}checked{% endif %}> Activity Logs</label>
+        </div>
+
+        <button type="submit">💾 Update Permissions</button>
+      {% else %}
+        <p class="note">🔍 Enter PIN and click Search to load the user</p>
+        <button type="submit">🔍 Search</button>
+      {% endif %}
+    </form>
+  </div>
+
+</body>
+</html>

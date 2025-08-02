@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MBBS Result Checker</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #1e1e1e;
+      color: #f0f0f0;
+      font-family: sans-serif;
+      padding: 20px;
+    }
+    .container {
+      max-width: 1000px;
+      margin: auto;
+      background: #2a2a2a;
+      padding: 25px;
+      border-radius: 10px;
+      position: relative;
+    }
+    input[type="file"], select, button {
+      margin: 5px;
+      padding: 10px;
+      background: #333;
+      color: #f0f0f0;
+      border: 1px solid #555;
+      border-radius: 5px;
+    }
+    button:hover { background-color: #555; }
+    #downloadBtn:hover { background: #218838; }
+    #cancelBtn:hover { background: #c82333; }
+
+    .table-container {
+      max-height: 400px;
+      overflow: auto;
+      border: 1px solid #444;
+      border-radius: 6px;
+      margin-top: 15px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 14px;
+    }
+    th, td {
+      padding: 10px;
+      border: 1px solid #444;
+      white-space: nowrap;
+    }
+    th {
+      background: #333;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+    tr:nth-child(even) { background-color: #2f2f2f; }
+    tr:hover { background-color: #3a3a3a; }
+
+    #progressCircle {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 60px;
+      height: 60px;
+      background: conic-gradient(#28a745 0%, #444 0%);
+      border-radius: 50%;
+      display: none;
+      justify-content: center;
+      align-items: center;
+      font-size: 16px;
+      color: white;
+      font-weight: bold;
+      transition: background 0.5s ease;
+    }
+
+    .counters-box {
+      display: flex;
+      flex-wrap: nowrap;
+      justify-content: space-around;
+      background: #222;
+      border: 1px solid #555;
+      border-radius: 6px;
+      padding: 10px;
+      margin: 15px 0;
+      font-size: 16px;
+      gap: 10px;
+      overflow-x: auto;
+    }
+
+    #searchWrapper {
+      display: flex;
+      align-items: center;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    #searchInput {
+      padding: 10px;
+      width: 300px;
+      min-width: 200px;
+      background: #1a1a1a;
+      border: 1px solid #555;
+      color: #f0f0f0;
+      border-radius: 5px;
+    }
+
+    #actionButtons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div id="progressCircle">0%</div>
+
+    <h1 style="text-align: center;">Live MBBS Result Checker</h1>
+
+    <h4>📄 Upload Excel or DOCX File</h4>
+    <input type="file" id="inputFile" accept=".xlsx,.xls,.docx" />
+    <button onclick="handleUpload()">Upload</button>
+    <button id="downloadBtn" style="display:none; background: #28a745;">⬇ Download</button>
+
+    <div class="actionButtons" id="columnSelect" style="display:none; margin-top: 10px;">
+      <label>MBBS Roll:</label>
+      <select id="rollCol"></select>   
+        <button onclick="startExcel()">Submit</button>
+        <button id="cancelBtn" style="display:none; background: #dc3545;">⛔ Cancel</button>
+    </div>
+
+    <div id="searchWrapper">
+      <label>🎯 Select Result to Show in "Select Result" Column:</label>
+      <select id="resultSelector">
+        <option value="">-- Select Result --</option>
+      </select>
+      <label>🔍 Search:</label>
+      <input type="text" id="searchInput" placeholder="Search by Roll, Name, or Merit Position" />
+    </div>
+
+    <div id="counters" class="counters-box">
+      <div>🔢 Total: <span id="totalRows">0</span></div>
+      <div>🔄 Processed: <span id="processedRows">0</span></div>
+      <div>✅ Chance: <span id="chanceRows">0</span></div>
+      <div>⚠️ Data Error: <span id="errorRows">0</span></div>
+    </div>
+
+    <div class="table-container">
+      <table id="resultTable">
+        <thead>
+          <tr>
+            <th>SL</th>
+            <th>MBBS Roll</th>
+            <th>Student Name</th>
+            <th>Merit Position</th>
+            <th id="selectedResultHeader">Select Result</th>
+          </tr>
+        </thead>
+        <tbody id="resultBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+<script>
+  const resultLabels = {
+    "Result_1": "Roll No",
+    "Result_2": "Student Name",
+    "Result_3": "Test Score",
+    "Result_4": "Merit Score",
+    "Result_5": "Merit Position",
+    "Result_6": "Allotted College Code",
+    "Result_7": "Status"
+  };
+
+  let uploadedPath = "";
+  let tableData = [];
+  let selectedResultKey = "";
+  let total = 0, count = 0, chanceCount = 0, errorCount = 0;
+  let evt = null;
+
+  function handleUpload() {
+    const file = document.getElementById("inputFile").files[0];
+    if (!file) return alert("Please select a file.");
+    const formData = new FormData();
+    formData.append("file", file);
+
+    fetch("/upload", { method: "POST", body: formData })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) return alert("❌ " + data.error);
+        uploadedPath = data.file_path;
+
+        if (data.type === "excel") {
+          const cols = data.columns;
+          const rollSelect = document.getElementById("rollCol");
+          rollSelect.innerHTML = "";
+          cols.forEach(col => {
+            const opt = document.createElement("option");
+            opt.value = col;
+            opt.textContent = col;
+            rollSelect.appendChild(opt);
+          });
+          document.getElementById("columnSelect").style.display = "block";
+        } else if (data.type === "docx") {
+          startProcessing(`/process?file_path=${encodeURIComponent(uploadedPath)}`);
+        }
+      });
+  }
+
+  function startExcel() {
+    const roll = document.getElementById("rollCol").value;
+    if (!roll) return alert("Please select the MBBS Roll column.");
+    const params = new URLSearchParams({ file_path: uploadedPath, roll_col: roll });
+    startProcessing("/process?" + params.toString());
+  }
+
+  function startProcessing(url) {
+    evt = new EventSource(url);
+    const tbody = document.getElementById("resultBody");
+    const resultSelector = document.getElementById("resultSelector");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const circle = document.getElementById("progressCircle");
+    const cancelBtn = document.getElementById("cancelBtn");
+
+    tbody.innerHTML = "";
+    resultSelector.innerHTML = '<option value="">-- Select Result --</option>';
+    downloadBtn.style.display = "none";
+    circle.style.display = "flex";
+    cancelBtn.style.display = "inline-block";
+    tableData = [];
+    selectedResultKey = "";
+    total = 0; count = 0; chanceCount = 0; errorCount = 0;
+
+    document.getElementById("totalRows").textContent = 0;
+    document.getElementById("processedRows").textContent = 0;
+    document.getElementById("chanceRows").textContent = 0;
+    document.getElementById("errorRows").textContent = 0;
+
+    cancelBtn.onclick = () => {
+      if (evt) {
+        evt.close();
+        evt = null;
+        circle.style.display = "none";
+        cancelBtn.style.display = "none";
+        alert("⛔ Processing Cancelled.");
+      }
+    };
+
+    evt.onmessage = e => {
+      const data = JSON.parse(e.data);
+      if (data.total_rows) {
+        total = data.total_rows;
+        document.getElementById("totalRows").textContent = total;
+      }
+
+      if (data.download) {
+        downloadBtn.style.display = "inline-block";
+        downloadBtn.onclick = () => window.location = data.download;
+        circle.style.display = "none";
+        cancelBtn.style.display = "none";
+        evt.close();
+        return;
+      }
+
+      if (data.MBBS_Roll) {
+        tableData.push(data);
+        Object.keys(data).forEach(key => {
+          if (key.startsWith("Result_") && !Array.from(resultSelector.options).some(opt => opt.value === key)) {
+            const opt = document.createElement("option");
+            opt.value = key;
+            opt.textContent = resultLabels[key] || key;
+            resultSelector.appendChild(opt);
+          }
+        });
+
+        if (data.Result_6 && data.Result_6.trim() !== "") {
+          chanceCount++;
+          document.getElementById("chanceRows").textContent = chanceCount;
+        }
+
+        count++;
+        document.getElementById("processedRows").textContent = count;
+        updateProgress(count, total);
+        renderTableRows();
+      } else if (data.error) {
+        errorCount++;
+        document.getElementById("errorRows").textContent = errorCount;
+      }
+    };
+
+    evt.onerror = () => {
+      circle.style.display = "none";
+      cancelBtn.style.display = "none";
+      evt.close();
+    };
+  }
+
+  function updateProgress(count, total) {
+    const circle = document.getElementById("progressCircle");
+    if (total > 0) {
+      const percent = Math.round((count / total) * 100);
+      circle.textContent = percent + "%";
+      circle.style.background = `conic-gradient(#28a745 ${percent}%, #444 ${percent}%)`;
+    }
+  }
+
+  function renderTableRows() {
+    const tbody = document.getElementById("resultBody");
+    const selectedHeader = document.getElementById("selectedResultHeader");
+    selectedHeader.textContent = selectedResultKey ? (resultLabels[selectedResultKey] || selectedResultKey) : "Select Result";
+
+    const query = document.getElementById("searchInput").value.toLowerCase();
+    tbody.innerHTML = "";
+
+    tableData.forEach((data, i) => {
+      const roll = (data.MBBS_Roll || "").toString().toLowerCase();
+      const name = (data.Result_2 || "").toLowerCase();
+      const merit = (data.Result_5 || "").toLowerCase();
+      const selectedValue = (selectedResultKey && data[selectedResultKey]) ? data[selectedResultKey].toLowerCase() : "";
+
+      if (roll.includes(query) || name.includes(query) || merit.includes(query) || selectedValue.includes(query)) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i + 1}</td>
+          <td>${data.MBBS_Roll}</td>
+          <td>${data.Result_2 || ""}</td>
+          <td>${data.Result_5 || ""}</td>
+          <td>${selectedResultKey ? (data[selectedResultKey] || "") : ""}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    });
+  }
+
+  document.getElementById("resultSelector").addEventListener("change", e => {
+    selectedResultKey = e.target.value;
+    renderTableRows();
+  });
+
+  document.getElementById("searchInput").addEventListener("input", renderTableRows);
+</script>
+</body>
+</html>

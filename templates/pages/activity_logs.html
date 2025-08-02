@@ -1,0 +1,56 @@
+<!-- templates/pages/activity_logs.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Activity Logs</title>
+  <style>
+    body {
+      background: #121212;
+      color: #eee;
+      font-family: Arial;
+      padding: 30px;
+    }
+    h2 { color: #ff6666; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #1e1e1e;
+    }
+    th, td {
+      border: 1px solid #333;
+      padding: 10px;
+      text-align: left;
+    }
+    th {
+      background: #333;
+    }
+    tr:nth-child(even) {
+      background: #252525;
+    }
+  </style>
+</head>
+<body>
+  <h2>📋 Activity Logs</h2>
+  <table>
+    <tr>
+      <th>User ID</th>
+      <th>Action</th>
+      <th>Log ID</th>
+    </tr>
+    {% for log in logs %}
+      <tr>
+        <td>
+          {% if log.user is string %}
+            {{ log.user }}
+          {% else %}
+            {{ log.user.user_id }}
+          {% endif %}
+        </td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.id }}</td>
+      </tr>
+    {% endfor %}
+  </table>
+</body>
+</html>

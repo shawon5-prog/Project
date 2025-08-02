@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Add User</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-dark text-white">
+  <div class="container mt-5">
+    <h3>Add New User</h3>
+    <form method="POST" enctype="multipart/form-data" class="bg-secondary p-4 rounded shadow">
+      <div class="mb-3">
+        <label>User ID</label>
+        <input type="text" name="user_id" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label>Password</label>
+        <input type="password" name="password" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label>Nickname</label>
+        <input type="text" name="name" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label>Email</label>
+        <input type="email" name="email" class="form-control" />
+      </div>
+      <div class="mb-3">
+        <label>Status</label>
+        <select name="status" class="form-select">
+          <option value="active" selected>Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label>Permissions</label><br />
+        {% for perm in permissions %}
+          <div class="form-check form-check-inline">
+            <input class="form-check-input" type="checkbox" name="permissions" value="{{ perm }}">
+            <label class="form-check-label">{{ perm }}</label>
+          </div>
+        {% endfor %}
+      </div>
+      <div class="mb-3">
+        <label>Profile Photo</label>
+        <input type="file" name="photo" class="form-control" />
+      </div>
+      <button type="submit" class="btn btn-primary">Add User</button>
+      <a href="{{ url_for('management.management_home') }}" class="btn btn-secondary">Back</a>
+    </form>
+  </div>
+</body>
+</html>
