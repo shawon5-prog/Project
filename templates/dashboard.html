@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>UMS Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #1e1e1e;
+      color: #f0f0f0;
+    }
+
+    .navbar {
+      background: #2e2a2a;
+      padding: 10px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .navbar-brand {
+      font-size: 20px;
+      font-weight: bold;
+      color: #ffffff;
+      text-decoration: none;
+    }
+
+    .navbar-user {
+      font-size: 14px;
+    }
+
+    .logout-btn {
+      padding: 5px 12px;
+      background: transparent;
+      color: #ff8888;
+      border: 1px solid #ff8888;
+      border-radius: 4px;
+      text-decoration: none;
+      margin-left: 10px;
+    }
+
+    .logout-btn:hover {
+      background: #ff8888;
+      color: #000;
+    }
+
+    .main {
+      display: flex;
+    }
+
+    .sidebar {
+      width: 240px;
+      background: #000;
+      height: 100vh;
+      padding: 15px;
+      overflow-y: auto;
+    }
+
+    .accordion-item {
+      margin-bottom: 10px;
+      border-radius: 8px;
+      background-color: #2a2a2a;
+    }
+
+    .accordion-header {
+      padding: 12px;
+      background: none;
+      border: none;
+      width: 100%;
+      text-align: left;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .accordion-header::after {
+      content: "▼";
+      position: absolute;
+      right: 15px;
+      transition: transform 0.3s ease;
+    }
+
+    .accordion-header.active::after {
+      transform: rotate(180deg);
+    }
+
+    .accordion-body {
+      display: none;
+      padding: 5px 10px;
+      background: #1b1b1b;
+    }
+
+    .accordion-body a {
+      display: block;
+      color: #ccc;
+      text-decoration: none;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-bottom: 5px;
+      background: #333;
+    }
+
+    .accordion-body a:hover {
+      background: #555;
+      color: #fff;
+    }
+
+    .content {
+      flex: 1;
+      padding: 20px;
+    }
+
+    .sidebar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .sidebar::-webkit-scrollbar-thumb {
+      background-color: #333;
+      border-radius: 10px;
+    }
+
+    @media (max-width: 768px) {
+      .main {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 🔹 Navbar -->
+  <div class="navbar">
+    <a class="navbar-brand" href="#">UMS Dashboard</a>
+    <div class="navbar-user">
+      {{ user.name }} |
+      <a href="{{ url_for('auth.logout') }}" class="logout-btn">Logout</a>
+    </div>
+  </div>
+
+  <!-- 🔹 Main Layout -->
+  <div class="main">
+    <!-- Sidebar Menu -->
+    <div class="sidebar">
+      <div id="menuContainer"></div>
+    </div>
+
+    <!-- Content Area -->
+    <div class="content" id="mainContent">
+      <h2>👋 Welcome, {{ user.name }}!</h2>
+      <p>Select any menu to load content dynamically.</p>
+    </div>
+  </div>
+
+  <!-- 🔹 Menu & JS -->
+  <script>
+    const userPermissions = {{ permissions | tojson }};
+
+    const menuData = [
+      {
+        title: "Medical User ID",
+        items: [
+          { name: "MBBS User ID", file: "/content/mbbs_user_id", permission: "mbbs_user_id" },
+          { name: "BDS User ID", file: "/content/bds_user_id", permission: "bds_user_id" }
+        ]
+      },
+      {
+        title: "Medical Password",
+        items: [
+          { name: "MBBS Password", file: "/content/mbbs_pass_recover", permission: "mbbs_pass_recover" },
+          { name: "BDS Password", file: "/content/bds_pass_recover", permission: "bds_pass_recover" }
+        ]
+      },
+      {
+        title: "Medical Roll",
+        items: [
+          { name: "MBBS Roll", file: "/content/mbbs_roll", permission: "mbbs_roll" },
+          { name: "BDS Roll", file: "/content/bds_roll", permission: "bds_roll" }
+        ]
+      },
+      {
+        title: "Medical Result",
+        items: [
+          { name: "MBBS Result", file: "/content/mbbs_result", permission: "mbbs_result" },
+          { name: "BDS Result", file: "/content/bds_result", permission: "bds_result" }
+        ]
+      },
+      {
+        title: "Report",
+        items: [
+          { name: "Individual Report", file: "/content/individual_report", permission: "individual_report" },
+          { name: "Combined Report", file: "/content/combined_report", permission: "combined_report" }
+        ]
+      },
+      {
+        title: "Management",
+        items: [
+          { name: "Add Members", file: "/content/add_members", permission: "add_members" },
+          { name: "Permission Setup", file: "/content/permission_setup", permission: "permission_setup" },
+          { name: "User Info Edit", file: "/content/user_info_edit", permission: "user_info_edit" },
+          { name: "Activity Logs", file: "/content/activity_logs", permission: "activity_logs" }
+        ]
+      }
+    ];
+
+    function renderMenu() {
+      const container = document.getElementById('menuContainer');
+      menuData.forEach(menu => {
+        const allowedItems = menu.items.filter(item => userPermissions.includes(item.permission));
+        if (allowedItems.length === 0) return;
+
+        const item = document.createElement('div');
+        item.className = 'accordion-item';
+
+        const header = document.createElement('button');
+        header.className = 'accordion-header';
+        header.textContent = menu.title;
+
+        const body = document.createElement('div');
+        body.className = 'accordion-body';
+
+        allowedItems.forEach(sub => {
+          const link = document.createElement('a');
+          link.href = "#";
+          link.textContent = sub.name;
+          link.setAttribute("data-file", sub.file);
+
+          link.addEventListener("click", (e) => {
+            e.preventDefault();
+            const file = link.getAttribute("data-file");
+
+            fetch(file)
+              .then(res => {
+                if (!res.ok) throw new Error("Failed to load");
+                return res.text();
+              })
+              .then(html => {
+                document.getElementById("mainContent").innerHTML = html;
+              })
+              .catch(err => {
+                document.getElementById("mainContent").innerHTML = "<p style='color:red;'>Error loading content.</p>";
+              });
+          });
+
+          body.appendChild(link);
+        });
+
+        header.addEventListener("click", () => {
+          const allBodies = document.querySelectorAll(".accordion-body");
+          const allHeaders = document.querySelectorAll(".accordion-header");
+
+          allBodies.forEach(b => b.style.display = "none");
+          allHeaders.forEach(h => h.classList.remove("active"));
+
+          body.style.display = "block";
+          header.classList.add("active");
+        });
+
+        item.appendChild(header);
+        item.appendChild(body);
+        container.appendChild(item);
+      });
+    }
+
+    renderMenu();
+  </script>
+</body>
+</html>
