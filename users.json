@@ -1,0 +1,76 @@
+[
+  {
+    "user_id": "admin",
+    "pin": "0001",
+    "email": "viewer@example.com",
+    "password": "1234",
+    "permissions": [
+      "mbbs_user_id",
+      "bds_user_id",
+      "mbbs_pass_recover",
+      "bds_pass_recover",
+      "mbbs_roll",
+      "bds_roll",
+      "mbbs_result",
+      "bds_result",
+      "individual_report",
+      "combined_report",
+      "add_members",
+      "permission_setup",
+      "user_info_edit",
+      "activity_logs"
+    ],
+    "info": {},
+    "status": "active",
+    "role": "viewer",
+    "photo": "",
+    "name": "AtikuL Islam Shawon",
+    "mobile": "01767967126"
+  },
+  {
+    "user_id": "viewer",
+    "pin": "0002",
+    "email": "viewer@example.com",
+    "password": "123456",
+    "permissions": [
+      "dashboard",
+      "mbbs_user_id",
+      "mbbs_pass_recover",
+      "management"
+    ],
+    "info": {},
+    "status": "active",
+    "role": "viewer",
+    "photo": "",
+    "name": "viewer",
+    "mobile": ""
+  },
+  {
+    "user_id": "shawon",
+    "pin": "3566",
+    "email": "atikul5@gmail.com",
+    "password": "1230",
+    "permissions": [
+      "dashboard"
+    ],
+    "info": {},
+    "status": "active",
+    "role": "viewer",
+    "photo": "",
+    "name": "",
+    "mobile": ""
+  },
+  {
+    "user_id": "hero",
+    "pin": "0004",
+    "email": "atikulislamshawon5@gmail.com",
+    "password": "8520",
+    "permissions": [],
+    "info": {},
+    "status": "active",
+    "role": "viewer",
+    "photo": "",
+    "name": "",
+    "mobile": ""
+  }
+]

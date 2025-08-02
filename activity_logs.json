@@ -1,0 +1,119 @@
+[
+  {
+    "user": {
+      "email": "shawon.3566@gmail.com",
+      "name": "",
+      "user_id": "admin"
+    },
+    "action": "Added new member: viewer",
+    "id": "fce3599d-b9f9-4c70-81e3-012b2bfe5c35"
+  },
+  {
+    "id": "53288fe2-45cb-4e11-a453-e3da2dd5a19f",
+    "user": {
+      "email": "atikulislamshaon05@gmail.com",
+      "name": "Unknown",
+      "user_id": "viewer"
+    },
+    "action": "Added new member: viewer1"
+  },
+  {
+    "id": "0541ce3e-78f1-485f-b68b-486c6f833aae",
+    "user": {
+      "email": "viewer@example.com",
+      "name": "AtikuL Islam Shawon",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "admin"
+    },
+    "action": "Added new member: shawon"
+  },
+  {
+    "id": "e29b6654-6153-42df-bcc2-5ba300e0852f",
+    "user": {
+      "email": "viewer@example.com",
+      "name": "AtikuL Islam Shawon",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "admin"
+    },
+    "action": "Added new member: hero"
+  },
+  {
+    "id": "1083ca15-cec8-460b-a1d2-3352eba6c1d6",
+    "user": {
+      "email": "viewer@example.com",
+      "name": "AtikuL Islam Shawon",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "admin"
+    },
+    "action": "Updated permissions for PIN: 0002"
+  },
+  {
+    "id": "1949622e-0df8-43ff-8091-a9caae67cab9",
+    "user": {
+      "email": "viewer@example.com",
+      "name": "viewer",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "viewer"
+    },
+    "action": "Updated permissions for PIN: 0002"
+  },
+  {
+    "id": "95030484-b64f-46e3-af1b-cf7466cec061",
+    "user": {
+      "email": "viewer@example.com",
+      "name": "AtikuL Islam Shawon",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "admin"
+    },
+    "action": "Updated permissions for PIN: 0001"
+  },
+  {
+    "id": "ae4ed2c2-33a2-4c46-903c-9e0c06f284d6",
+    "user": {
+      "email": "atikul5@gmail.com",
+      "name": "",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "shawon"
+    },
+    "action": "Updated permissions for PIN: 0001"
+  },
+  {
+    "id": "b95b5296-eb45-40d8-88b2-d4aa7c38c575",
+    "user": {
+      "email": "atikul5@gmail.com",
+      "name": "",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "shawon"
+    },
+    "action": "Updated permissions for PIN: 3566"
+  },
+  {
+    "id": "57dd3981-14cf-4534-8900-94cf7d7be6c3",
+    "user": {
+      "email": "viewer@example.com",
+      "name": "AtikuL Islam Shawon",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "admin"
+    },
+    "action": "Updated permissions for PIN: 0001"
+  },
+  {
+    "id": "102d3bab-bf20-401c-96df-45ddb738ddf7",
+    "user": {
+      "email": "viewer@example.com",
+      "name": "AtikuL Islam Shawon",
+      "photo": "",
+      "role": "viewer",
+      "user_id": "admin"
+    },
+    "action": "Updated permissions for PIN: 0001"
+  }
+]
